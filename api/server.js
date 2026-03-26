@@ -50,7 +50,135 @@ db.serialize(() => {
 })
 
 app.get('/api', (req, res) => {
-  res.json({ message: 'Expense Tracker API is running' })
+  db.all('SELECT * FROM expenses', (err, rows) => {
+    if (err) {
+      return res.status(500).json({ error: err.message })
+    }
+    res.json(rows)
+  })
+})
+
+app.post('/api', (req, res) => {
+  const { title, category, amount, date } = req.body
+
+  if (!title || !category || amount === undefined || !date) {
+    return res.status(400).json({ error: 'Missing required fields' })
+  }
+
+  const sql = `
+    INSERT INTO expenses (title, category, amount, date)
+    VALUES (?, ?, ?, ?)
+  `
+
+  db.run(sql, [title, category, amount, date], function (err) {
+    if (err) {
+      return res.status(500).json({ error: err.message })
+    }
+
+    res.json({ status: `New record created with id=${this.lastID}` })
+  })
+})
+
+app.put('/api', (req, res) => {
+  const expenses = req.body
+
+  if (!Array.isArray(expenses)) {
+    return res.status(400).json({ error: 'Request body must be an array' })
+  }
+
+  db.serialize(() => {
+    db.run('DELETE FROM expenses', (err) => {
+      if (err) {
+        return res.status(500).json({ error: err.message })
+      }
+
+      const stmt = db.prepare(`
+        INSERT INTO expenses (title, category, amount, date)
+        VALUES (?, ?, ?, ?)
+      `)
+
+      for (const expense of expenses) {
+        stmt.run(expense.title, expense.category, expense.amount, expense.date)
+      }
+
+      stmt.finalize((finalizeErr) => {
+        if (finalizeErr) {
+          return res.status(500).json({ error: finalizeErr.message })
+        }
+
+        res.json({ status: 'Collection replaced' })
+      })
+    })
+  })
+})
+
+app.delete('/api', (req, res) => {
+  db.run('DELETE FROM expenses', (err) => {
+    if (err) {
+      return res.status(500).json({ error: err.message })
+    }
+
+    res.json({ status: 'Collection deleted' })
+  })
+})
+
+app.get('/api/:id', (req, res) => {
+  const id = req.params.id
+
+  db.get('SELECT * FROM expenses WHERE id = ?', [id], (err, row) => {
+    if (err) {
+      return res.status(500).json({ error: err.message })
+    }
+
+    if (!row) {
+      return res.status(404).json({ error: 'Record not found' })
+    }
+
+    res.json(row)
+  })
+})
+
+app.put('/api/:id', (req, res) => {
+  const id = req.params.id
+  const { title, category, amount, date } = req.body
+
+  if (!title || !category || amount === undefined || !date) {
+    return res.status(400).json({ error: 'Missing required fields' })
+  }
+
+  const sql = `
+    UPDATE expenses
+    SET title = ?, category = ?, amount = ?, date = ?
+    WHERE id = ?
+  `
+
+  db.run(sql, [title, category, amount, date, id], function (err) {
+    if (err) {
+      return res.status(500).json({ error: err.message })
+    }
+
+    if (this.changes === 0) {
+      return res.status(404).json({ error: 'Record not found' })
+    }
+
+    res.json({ status: `Record id=${id} updated` })
+  })
+})
+
+app.delete('/api/:id', (req, res) => {
+  const id = req.params.id
+
+  db.run('DELETE FROM expenses WHERE id = ?', [id], function (err) {
+    if (err) {
+      return res.status(500).json({ error: err.message })
+    }
+
+    if (this.changes === 0) {
+      return res.status(404).json({ error: 'Record not found' })
+    }
+
+    res.json({ status: `Record id=${id} deleted` })
+  })
 })
 
 app.listen(PORT, () => {
