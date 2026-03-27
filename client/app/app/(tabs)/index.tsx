@@ -42,8 +42,8 @@ export default function HomeScreen() {
     loadExpenses()
   }, [])
 
-  const handleRefresh = () => {
-    Alert.alert('Refresh button pressed')
+  const handleRefresh = async () => {
+    await loadExpenses()
   }
 
   const handleClearAll = () => {
