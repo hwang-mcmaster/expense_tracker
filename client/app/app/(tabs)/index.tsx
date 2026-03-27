@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   View,
   Text,
@@ -17,19 +17,30 @@ type Expense = {
   date: string
 }
 
-export default function HomeScreen() {
-  const [expenses, setExpenses] = useState<Expense[]>([
-    { id: 1, title: 'Groceries', category: 'Food', amount: 42.5, date: '2026-03-20' },
-    { id: 2, title: 'Bus Fare', category: 'Transport', amount: 3.25, date: '2026-03-21' },
-    { id: 3, title: 'Internet Bill', category: 'Bills', amount: 59.99, date: '2026-03-22' }
-  ])
+const API_URL = 'http://localhost:3000/api'
 
+export default function HomeScreen() {
+  const [expenses, setExpenses] = useState<Expense[]>([])
   const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null)
 
   const [title, setTitle] = useState('')
   const [category, setCategory] = useState('')
   const [amount, setAmount] = useState('')
   const [date, setDate] = useState('')
+
+  const loadExpenses = async () => {
+    try {
+      const response = await fetch(API_URL)
+      const data = await response.json()
+      setExpenses(data)
+    } catch (error) {
+      Alert.alert('Error', 'Could not load expenses from the server')
+    }
+  }
+
+  useEffect(() => {
+    loadExpenses()
+  }, [])
 
   const handleRefresh = () => {
     Alert.alert('Refresh button pressed')
