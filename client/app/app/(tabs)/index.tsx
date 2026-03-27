@@ -50,9 +50,36 @@ export default function HomeScreen() {
     Alert.alert('Clear All button pressed')
   }
 
-  const handleAddExpense = () => {
-    Alert.alert('Add Expense button pressed')
+  const handleAddExpense = async () => {
+  if (!title || !category || !amount || !date) {
+    Alert.alert('Error', 'Please fill in all fields')
+    return
   }
+
+  try {
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        title,
+        category,
+        amount: Number(amount),
+        date
+      })
+    })
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      Alert.alert('Error', data.error || 'Could not add expense')
+      return
+    }
+  } catch (error) {
+    Alert.alert('Error', 'Could not connect to the server')
+  }
+}
 
   const renderExpenseItem = ({ item }: { item: Expense }) => (
     <TouchableOpacity
