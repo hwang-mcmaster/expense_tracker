@@ -27,6 +27,7 @@ export default function HomeScreen() {
   const [category, setCategory] = useState('')
   const [amount, setAmount] = useState('')
   const [date, setDate] = useState('')
+  const [isEditing, setIsEditing] = useState(false)
 
   const loadExpenses = async () => {
     try {
@@ -37,6 +38,22 @@ export default function HomeScreen() {
       Alert.alert('Error', 'Could not load expenses from the server')
     }
   }
+
+  const loadExpenseById = async (id: number) => {
+  try {
+    const response = await fetch(`${API_URL}/${id}`)
+    const data = await response.json()
+
+    if (!response.ok) {
+      Alert.alert('Error', data.error || 'Could not load expense details')
+      return
+    }
+
+    setSelectedExpense(data)
+  } catch (error) {
+    Alert.alert('Error', 'Could not load expense details from the server')
+  }
+}
 
   useEffect(() => {
     loadExpenses()
@@ -93,7 +110,7 @@ export default function HomeScreen() {
   const renderExpenseItem = ({ item }: { item: Expense }) => (
     <TouchableOpacity
       style={styles.card}
-      onPress={() => setSelectedExpense(item)}
+      onPress={() => loadExpenseById(item.id)}
     >
       <Text style={styles.cardTitle}>{item.title}</Text>
       <Text style={styles.cardText}>Category: {item.category}</Text>
@@ -103,7 +120,7 @@ export default function HomeScreen() {
       <View style={styles.cardButtons}>
         <TouchableOpacity
           style={styles.smallButton}
-          onPress={() => setSelectedExpense(item)}
+          onPress={() => loadExpenseById(item.id)}
         >
           <Text style={styles.buttonText}>View</Text>
         </TouchableOpacity>
