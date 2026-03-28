@@ -76,6 +76,19 @@ export default function HomeScreen() {
       Alert.alert('Error', data.error || 'Could not add expense')
       return
     }
+
+    await loadExpenses()
+  } catch (error) {
+    Alert.alert('Error', 'Could not connect to the server')
+  }
+}
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      Alert.alert('Error', data.error || 'Could not add expense')
+      return
+    }
   } catch (error) {
     Alert.alert('Error', 'Could not connect to the server')
   }
