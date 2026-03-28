@@ -130,6 +130,18 @@ const handleDeleteExpense = async (id: number) => {
   }
 }
 
+const handleStartEdit = () => {
+  if (!selectedExpense) {
+    return
+  }
+
+  setTitle(selectedExpense.title)
+  setCategory(selectedExpense.category)
+  setAmount(selectedExpense.amount.toString())
+  setDate(selectedExpense.date)
+  setIsEditing(true)
+}
+
   const renderExpenseItem = ({ item }: { item: Expense }) => (
     <TouchableOpacity
       style={styles.card}
@@ -181,7 +193,9 @@ const handleDeleteExpense = async (id: number) => {
         style={styles.list}
       />
 
-      <Text style={styles.sectionTitle}>Add New Expense</Text>
+      <Text style={styles.sectionTitle}>
+        {isEditing ? 'Edit Expense' : 'Add New Expense'}
+      </Text>
 
       <View style={styles.form}>
         <TextInput
@@ -214,7 +228,9 @@ const handleDeleteExpense = async (id: number) => {
         />
 
         <TouchableOpacity style={styles.addButton} onPress={handleAddExpense}>
-          <Text style={styles.buttonText}>Add Expense</Text>
+          <Text style={styles.buttonText}>
+            {isEditing ? 'Save Changes' : 'Add Expense'}
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -233,7 +249,7 @@ const handleDeleteExpense = async (id: number) => {
             <View style={styles.detailButtons}>
               <TouchableOpacity
                 style={styles.actionButton}
-                onPress={() => Alert.alert('Edit button pressed')}
+                onPress={handleStartEdit}
               >
                 <Text style={styles.buttonText}>Edit</Text>
               </TouchableOpacity>
