@@ -107,6 +107,29 @@ export default function HomeScreen() {
   }
 }
 
+const handleDeleteExpense = async (id: number) => {
+  try {
+    const response = await fetch(`${API_URL}/${id}`, {
+      method: 'DELETE'
+    })
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      Alert.alert('Error', data.error || 'Could not delete expense')
+      return
+    }
+
+    await loadExpenses()
+    setSelectedExpense(null)
+    setIsEditing(false)
+
+    Alert.alert('Success', data.status)
+  } catch (error) {
+    Alert.alert('Error', 'Could not connect to the server')
+  }
+}
+
   const renderExpenseItem = ({ item }: { item: Expense }) => (
     <TouchableOpacity
       style={styles.card}
@@ -127,7 +150,7 @@ export default function HomeScreen() {
 
         <TouchableOpacity
           style={styles.smallDeleteButton}
-          onPress={() => Alert.alert('Delete button pressed')}
+          onPress={() => handleDeleteExpense(item.id)}
         >
           <Text style={styles.buttonText}>Delete</Text>
         </TouchableOpacity>
@@ -217,7 +240,7 @@ export default function HomeScreen() {
 
               <TouchableOpacity
                 style={styles.smallDeleteButton}
-                onPress={() => Alert.alert('Delete button pressed')}
+                onPress={() => selectedExpense && handleDeleteExpense(selectedExpense.id)}
               >
                 <Text style={styles.buttonText}>Delete</Text>
               </TouchableOpacity>
