@@ -78,17 +78,13 @@ export default function HomeScreen() {
     }
 
     await loadExpenses()
-  } catch (error) {
-    Alert.alert('Error', 'Could not connect to the server')
-  }
-}
 
-    const data = await response.json()
+    setTitle('')
+    setCategory('')
+    setAmount('')
+    setDate('')
 
-    if (!response.ok) {
-      Alert.alert('Error', data.error || 'Could not add expense')
-      return
-    }
+    Alert.alert('Success', data.status)
   } catch (error) {
     Alert.alert('Error', 'Could not connect to the server')
   }
