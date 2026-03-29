@@ -260,11 +260,14 @@ const handleStartEdit = () => {
       <Text style={styles.sectionTitle}>Expense List</Text>
 
       <FlatList
-        data={expenses}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={renderExpenseItem}
-        style={styles.list}
-      />
+         data={expenses}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={renderExpenseItem}
+          style={styles.list}
+          ListEmptyComponent={
+            <Text style={styles.placeholderText}>No expenses found</Text>
+          }
+        />
 
       <Text style={styles.sectionTitle}>
         {isEditing ? 'Edit Expense' : 'Add New Expense'}
