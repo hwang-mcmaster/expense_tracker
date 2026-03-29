@@ -63,9 +63,32 @@ export default function HomeScreen() {
     await loadExpenses()
   }
 
-  const handleClearAll = () => {
-    Alert.alert('Clear All button pressed')
+  const handleClearAll = async () => {
+  try {
+    const response = await fetch(API_URL, {
+      method: 'DELETE'
+    })
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      Alert.alert('Error', data.error || 'Could not clear expenses')
+      return
+    }
+
+    await loadExpenses()
+    setSelectedExpense(null)
+    setTitle('')
+    setCategory('')
+    setAmount('')
+    setDate('')
+    setIsEditing(false)
+
+    Alert.alert('Success', data.status)
+  } catch (error) {
+    Alert.alert('Error', 'Could not connect to the server')
   }
+}
 
   const handleAddExpense = async () => {
   if (!title || !category || !amount || !date) {
