@@ -164,25 +164,6 @@ export default function HomeScreen() {
   }
 }
 
-    const data = await response.json()
-
-    if (!response.ok) {
-      Alert.alert('Error', data.error || 'Could not add expense')
-      return
-    }
-
-    await loadExpenses()
-
-    setTitle('')
-    setCategory('')
-    setAmount('')
-    setDate('')
-
-    Alert.alert('Success', data.status)
-  } catch (error) {
-    Alert.alert('Error', 'Could not connect to the server')
-  }
-}
 
 const handleDeleteExpense = async (id: number) => {
   try {
@@ -200,6 +181,10 @@ const handleDeleteExpense = async (id: number) => {
     await loadExpenses()
     setSelectedExpense(null)
     setIsEditing(false)
+    setTitle('')
+    setCategory('')
+    setAmount('')
+    setDate('')
 
     Alert.alert('Success', data.status)
   } catch (error) {
