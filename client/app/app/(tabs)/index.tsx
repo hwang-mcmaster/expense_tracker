@@ -91,10 +91,21 @@ export default function HomeScreen() {
 }
 
   const handleAddExpense = async () => {
-  if (!title || !category || !amount || !date) {
+    if (!title || !category || !amount || !date) {
     Alert.alert('Error', 'Please fill in all fields')
     return
-  }
+}
+
+  if (isNaN(Number(amount)) || Number(amount) <= 0) {
+    Alert.alert('Error', 'Amount must be a valid number greater than 0')
+    return
+}
+
+const datePattern = /^\d{4}-\d{2}-\d{2}$/
+if (!datePattern.test(date)) {
+  Alert.alert('Error', 'Date must be in YYYY-MM-DD format')
+  return
+}
 
   try {
     if (isEditing && selectedExpense) {
