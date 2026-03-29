@@ -74,6 +74,40 @@ export default function HomeScreen() {
   }
 
   try {
+    if (isEditing && selectedExpense) {
+      const response = await fetch(`${API_URL}/${selectedExpense.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          title,
+          category,
+          amount: Number(amount),
+          date
+        })
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        Alert.alert('Error', data.error || 'Could not update expense')
+        return
+      }
+
+      await loadExpenses()
+      await loadExpenseById(selectedExpense.id)
+
+      setTitle('')
+      setCategory('')
+      setAmount('')
+      setDate('')
+      setIsEditing(false)
+
+      Alert.alert('Success', data.status)
+      return
+    }
+
     const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
@@ -86,6 +120,26 @@ export default function HomeScreen() {
         date
       })
     })
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      Alert.alert('Error', data.error || 'Could not add expense')
+      return
+    }
+
+    await loadExpenses()
+
+    setTitle('')
+    setCategory('')
+    setAmount('')
+    setDate('')
+
+    Alert.alert('Success', data.status)
+  } catch (error) {
+    Alert.alert('Error', 'Could not connect to the server')
+  }
+}
 
     const data = await response.json()
 
